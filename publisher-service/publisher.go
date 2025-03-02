@@ -10,6 +10,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type jsonResponse struct {
+  Error bool
+}
+
 
 const (
   rabbitHost = "RABBIT_HOST"
@@ -18,27 +22,37 @@ const (
   rabbitPass = "RABBIT_PASS"
 )
 
-var rabbit_host = os.Getenv(rabbitHost)
-var rabbit_port = os.Getenv(rabbitPort)
-var rabbit_user = os.Getenv(rabbitUser)
-var rabbit_pass = os.Getenv(rabbitPass)
-
 func main() {
   router := httprouter.New()
 
+  router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+    w.Header().Set("Content-Typ", "plain/text")    
+    w.WriteHeader(http.StatusOK)
+    _, err := w.Write([]byte("it's works!"))
+    if err != nil {
+      log.Println("Failed to write to Response")
+    }
+  })
   router.POST("/publish/:message", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     log.Println("Reciebed a post request at publish end")
     submit(w,r,p)
   })
 
   log.Println("Running publisher....")
-  log.Fatal(http.ListenAndServe(":80", router))
+  log.Fatal(http.ListenAndServe(":5000", router))
 }
 
 func submit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+  var rabbit_host = os.Getenv(rabbitHost)
+  var rabbit_port = os.Getenv(rabbitPort)
+  var rabbit_user = os.Getenv(rabbitUser)
+  var rabbit_pass = os.Getenv(rabbitPass)
+
   message := p.ByName("message")
   log.Println("Recieved message: "+ message)
-  url := fmt.Sprintf("amqp://%s:%s@%s:%s/",rabbit_user, rabbit_pass, rabbit_host, rabbit_pass)
+  url := fmt.Sprintf("amqp://%s:%s@%s:%s/",rabbit_user, rabbit_pass, rabbit_host, rabbit_port)
+  log.Printf("Try connect to RabbitMQ with url: %s\n", url)
   conn, err := amqp.Dial(url)
   if err != nil {
     log.Fatalf("%s: %s", "Failed to connect to RabbitMQ", err)
