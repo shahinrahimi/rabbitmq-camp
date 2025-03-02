@@ -22,6 +22,11 @@ const (
   rabbitPass = "RABBIT_PASS"
 )
 
+var rabbit_host = os.Getenv(rabbitHost)
+var rabbit_port = os.Getenv(rabbitPort)
+var rabbit_user = os.Getenv(rabbitUser)
+var rabbit_pass = os.Getenv(rabbitPass)
+
 func main() {
   router := httprouter.New()
 
@@ -44,15 +49,12 @@ func main() {
 
 func submit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-  var rabbit_host = os.Getenv(rabbitHost)
-  var rabbit_port = os.Getenv(rabbitPort)
-  var rabbit_user = os.Getenv(rabbitUser)
-  var rabbit_pass = os.Getenv(rabbitPass)
-
   message := p.ByName("message")
   log.Println("Recieved message: "+ message)
+
   url := fmt.Sprintf("amqp://%s:%s@%s:%s/",rabbit_user, rabbit_pass, rabbit_host, rabbit_port)
   log.Printf("Try connect to RabbitMQ with url: %s\n", url)
+
   conn, err := amqp.Dial(url)
   if err != nil {
     log.Fatalf("%s: %s", "Failed to connect to RabbitMQ", err)
