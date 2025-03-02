@@ -27,7 +27,8 @@ func main() {
   router := httprouter.New()
 
   router.POST("/publish/:message", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-
+    log.Println("Reciebed a post request at publish end")
+    submit(w,r,p)
   })
 
   log.Println("Running publisher....")
