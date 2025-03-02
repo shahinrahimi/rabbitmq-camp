@@ -12,9 +12,21 @@ services:
       RABBIT_USER: "guest"
       RABBIT_PASS: "guest" 
       
-
+  consumer-service:
+    image: consumer-api
+    build: ./consumer-service/
+    ports:
+      - 7701:5001
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBIT_HOST: "rabbitmq"
+      RABBIT_PORT: "5672"
+      RABBIT_USER: "guest"
+      RABBIT_PASS: "guest" 
+      
   rabbitmq:
     image: docker.arvancloud.ir/rabbitmq:3.9-management-alpine
     ports:
-      - 7701:15672 # use for rabbitmq management UI
+      - 7707:15672 # use for rabbitmq management UI
       - 5672:5672  # use for amqp communication
