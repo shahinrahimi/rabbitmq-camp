@@ -12,11 +12,9 @@ services:
       RABBIT_USER: "guest"
       RABBIT_PASS: "guest" 
       
-  consumer-service:
-    image: consumer-api
+  consumer-service-1:
+    image: consumer-api-1
     build: ./consumer-service/
-    ports:
-      - 7701:5001
     depends_on:
       - rabbitmq
     environment:
@@ -24,7 +22,18 @@ services:
       RABBIT_PORT: "5672"
       RABBIT_USER: "guest"
       RABBIT_PASS: "guest" 
-      
+
+  consumer-service-2:
+    image: consumer-api-2
+    build: ./consumer-service/
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBIT_HOST: "rabbitmq"
+      RABBIT_PORT: "5672"
+      RABBIT_USER: "guest"
+      RABBIT_PASS: "guest" 
+         
   rabbitmq:
     image: docker.arvancloud.ir/rabbitmq:3.9-management-alpine
     ports:
